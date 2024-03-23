@@ -6,7 +6,7 @@ Example run: python3 mqtt-all.py --broker 192.168.1.164 --topic enviro --usernam
 """
 
 import argparse
-import ST7735
+import st7735
 import time
 import ssl
 from bme280 import BME280
@@ -45,14 +45,14 @@ DEFAULT_PASSWORD = None
 
 
 # mqtt callbacks
-def on_connect(client, userdata, flags, rc):
+def on_connect(client, userdata, flags, rc, properties):
     if rc == 0:
         print("connected OK")
     else:
         print("Bad connection Returned code=", rc)
 
 
-def on_publish(client, userdata, mid):
+def on_publish(client, userdata, mid, reason_code, properties):
     print("mid: " + str(mid))
 
 
@@ -210,7 +210,7 @@ def main():
     """
     )
 
-    mqtt_client = mqtt.Client(client_id=device_id)
+    mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id=device_id)
     if args.username and args.password:
         mqtt_client.username_pw_set(args.username, args.password)
     mqtt_client.on_connect = on_connect
@@ -230,8 +230,8 @@ def main():
     bme280 = BME280(i2c_dev=bus)
 
     # Create LCD instance
-    disp = ST7735.ST7735(
-        port=0, cs=1, dc=9, backlight=12, rotation=270, spi_speed_hz=10000000
+    disp = st7735.ST7735(
+        port=0, cs=1, dc="9", backlight="12", rotation=270, spi_speed_hz=10000000
     )
 
     # Initialize display
@@ -276,3 +276,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
